@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.sk_vr.videostreamer.ReceiveFeedActivity">
+
+    <TextView
+        android:id="@+id/statusText"
+        android:text="Status: Not connected to sender"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:layout_below="@id/statusText"
+        android:id="@+id/contentDisplayText"
+        android:text="Content Received:"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <ImageView
+        android:id="@+id/receivedImg"
+        android:layout_below="@id/contentDisplayText"
+        android:layout_width="match_parent"
+        android:layout_height="400dp" />
+</RelativeLayout>

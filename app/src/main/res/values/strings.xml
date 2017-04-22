@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">VideoStreamer</string>
+    <string name="common_socket">49163</string>
+    <string name="img_socket">49164</string>
+</resources>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="false"
+        jar="C:\Users\karti\.android\build-cache\289097df049e2b52fe3b1de2342b2200858a136a\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="150252b33b00274cc868578ade018fda0d43a3eb">
+        <dex dex="F:\OneDrive\Academics\KJSCE Stuff\Sem 6\MCAN\Practicals\Android Projects\VideoStreamer\app\build\intermediates\pre-dexed\debug\classes_24f86af16c1d0a56b65fc48dd3eb51eaac3e73c0.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\karti\.android\build-cache\6dc8559bbd7213309cc7cf5300fddc054504d4c6\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="6ef31f1555bb4cc513ec8d52711365a8b89f3600">
+        <dex dex="F:\OneDrive\Academics\KJSCE Stuff\Sem 6\MCAN\Practicals\Android Projects\VideoStreamer\app\build\intermediates\pre-dexed\debug\classes_217509d230b17a1c9fb34d670969e60b40e05eef.jar" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="F:\OneDrive\Academics\KJSCE Stuff\Sem 6\MCAN\Practicals\Android Projects\VideoStreamer\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="510aa6efc159983dfbffa676a0dae37568c0a46f">
+        <dex dex="F:\OneDrive\Academics\KJSCE Stuff\Sem 6\MCAN\Practicals\Android Projects\VideoStreamer\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run_56849fe82556ac09b2a21aabc7eb6c0cfc5979b8\classes.dex" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\karti\.android\build-cache\3b442edd93e3cf83763ea04663eb05a3e71389c5\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="052f5f840f21174a3ecf6544130194e2652cbb73">
+        <dex dex="F:\OneDrive\Academics\KJSCE Stuff\Sem 6\MCAN\Practicals\Android Projects\VideoStreamer\app\build\intermediates\pre-dexed\debug\classes_cf618549d1be17b4252896024c0760992992bea9.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\karti\.android\build-cache\6ae5cdfdbe372c2caea9ed65b00598023a214509\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="47635644d0d5c103c1dd8360549eb9ba3225c7d3">
+        <dex dex="F:\OneDrive\Academics\KJSCE Stuff\Sem 6\MCAN\Practicals\Android Projects\VideoStreamer\app\build\intermediates\pre-dexed\debug\classes_59c2a422fcea5bbd74a186c03311c07b35554fbd.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\karti\.android\build-cache\f7619b4b17a942c3775e935a786c602ca3b784ea\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="F:\OneDrive\Academics\KJSCE Stuff\Sem 6\MCAN\Practicals\Android Projects\VideoStreamer\app\build\intermediates\pre-dexed\debug\classes_7c31a6bff884919051d7b0b695c000010a9d4cd1.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\karti\.android\build-cache\4a31e17bd1e4ab3b4f38d7a9d447566a6314f014\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="4a26a1154d053ab11aaf4c3967c42a4d66390991">
+        <dex dex="F:\OneDrive\Academics\KJSCE Stuff\Sem 6\MCAN\Practicals\Android Projects\VideoStreamer\app\build\intermediates\pre-dexed\debug\classes_62a4710df28b86c738a5f239c72de497c4b79350.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\karti\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\25.3.1\support-annotations-25.3.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="bf8841d29fa39e077730e7a91222c2ce269fa7c9">
+        <dex dex="F:\OneDrive\Academics\KJSCE Stuff\Sem 6\MCAN\Practicals\Android Projects\VideoStreamer\app\build\intermediates\pre-dexed\debug\support-annotations-25.3.1_00524578fe9387003de13efd7488a41b22511a40.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\karti\.android\build-cache\29037422d472504319ef52d0084ad805e2fe8b06\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="da27a32db6af8954ee8061537c7d476fcb1df46f">
+        <dex dex="F:\OneDrive\Academics\KJSCE Stuff\Sem 6\MCAN\Practicals\Android Projects\VideoStreamer\app\build\intermediates\pre-dexed\debug\classes_5c9e6fccb387395da29f8c2596e0e3f51f587469.jar" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="F:\OneDrive\Academics\KJSCE Stuff\Sem 6\MCAN\Practicals\Android Projects\VideoStreamer\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="309787ac58346af7f3f2b850985fec24c7b0e18c">
+        <dex dex="F:\OneDrive\Academics\KJSCE Stuff\Sem 6\MCAN\Practicals\Android Projects\VideoStreamer\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_91a731e0bba55d8461a412a98ff728696e2270c4\classes.dex" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\karti\.android\build-cache\3a486dc8e5ab60e90867408e4e8bcfaec1ebfc18\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="efb8cb62d47d157c29d1521daac7eefd4cb881ee">
+        <dex dex="F:\OneDrive\Academics\KJSCE Stuff\Sem 6\MCAN\Practicals\Android Projects\VideoStreamer\app\build\intermediates\pre-dexed\debug\classes_8350d35dace72df29f5817a4ce7610c8c79eb827.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\karti\.android\build-cache\6fa52f9471e75ef38e1c9f8a88566625de4e99c8\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="45f697922e6f072daa12f8a2995dc77ab03c11da">
+        <dex dex="F:\OneDrive\Academics\KJSCE Stuff\Sem 6\MCAN\Practicals\Android Projects\VideoStreamer\app\build\intermediates\pre-dexed\debug\classes_fef5bdfe0fbe6ce9c1bea267cee574bc4334f6fd.jar" />
+    </item>
+
+</items>
