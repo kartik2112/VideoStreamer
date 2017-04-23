@@ -38,6 +38,7 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
     ImgWriter imgWriter;
     private Camera mCamera;
     private CameraPreview mPreview;
+    int commonPort,imagePort;
 
 
     @Override
@@ -65,6 +66,9 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
             }
         });
 
+        commonPort=Integer.parseInt(getResources().getString(R.string.common_socket));
+        imagePort=Integer.parseInt(getResources().getString(R.string.img_socket));
+
         // Create an instance of Camera
         mCamera = getCameraInstance();
 
@@ -73,26 +77,8 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
         FrameLayout preview = (FrameLayout) findViewById(R.id.camPreview);
         preview.addView(mPreview);
 
-
-
-
     }
 
-
-    /**
-     * Reference: https://developer.android.com/guide/topics/media/camera.html#access-camera
-     */
-    /** A safe way to get an instance of the Camera object. */
-    public static Camera getCameraInstance(){
-        Camera c = null;
-        try {
-            c = Camera.open(); // attempt to get a Camera instance
-        }
-        catch (Exception e){
-            // Camera is not available (in use or does not exist)
-        }
-        return c; // returns null if camera is unavailable
-    }
 
     @Override
     protected void onStop() {
@@ -140,7 +126,7 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
     @Override
     public void run() {
 
-        initializeSendFeedActivity(IPAddr,Integer.parseInt(getString(R.string.common_socket)));
+        initializeSendFeedActivity(IPAddr,commonPort);
 
         try{
             while(true){
@@ -157,6 +143,24 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
         catch (Exception e){
             Log.d("VS123",e.toString());
         }
+    }
+
+
+
+
+    /**
+     * Reference: https://developer.android.com/guide/topics/media/camera.html#access-camera
+     */
+    /** A safe way to get an instance of the Camera object. */
+    public static Camera getCameraInstance(){
+        Camera c = null;
+        try {
+            c = Camera.open(); // attempt to get a Camera instance
+        }
+        catch (Exception e){
+            // Camera is not available (in use or does not exist)
+        }
+        return c; // returns null if camera is unavailable
     }
 
 
@@ -202,7 +206,7 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
          */
         @Override
         public void run() {
-            initializeImgSend(IPAddr,Integer.parseInt(getString(R.string.img_socket)));
+            initializeImgSend(IPAddr,imagePort);
 
             /**
              * Reference: http://stackoverflow.com/questions/16602736/android-send-an-image-through-socket-programming
