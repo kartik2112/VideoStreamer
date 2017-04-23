@@ -3,6 +3,9 @@ package com.sk_vr.videostreamer;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -76,7 +80,7 @@ public class ReceiveFeedActivity extends AppCompatActivity implements Runnable{
         imgDisplayer.start();
     }
 
-    /*
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -90,7 +94,7 @@ public class ReceiveFeedActivity extends AppCompatActivity implements Runnable{
             Log.d("VS123","IOException from onStop() in SendFeed"+e.toString());
         }
 
-    }*/
+    }
 
     @Override
     public void run() {
@@ -149,25 +153,43 @@ public class ReceiveFeedActivity extends AppCompatActivity implements Runnable{
 
             try{
                 while(true){
-                    int len=imgIn.readInt();
+                    final int len=imgIn.readInt();
+//                    final int width=imgIn.readInt();
+//                    final int height=imgIn.readInt();
+
                     if(len<0){
                         continue;
                     }
-                    byte[] receivedImg=new byte[len];
+                    final byte[] receivedImg=new byte[len];
 
                     imgIn.readFully(receivedImg);
+
+                    /*
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getApplicationContext(),"Received Content from socket", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(),"Received Image of len "+len+" from socket", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    */
+
+                    Log.d("VS123","Img Receiver Thread - received Image of len "+len+" from socket");
+
+
+
+
+                    final Bitmap bm = BitmapFactory.decodeByteArray(receivedImg, 0, receivedImg.length);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            receivedImageView.setImageBitmap(bm);
                         }
                     });
 
-                    Log.d("VS123","Img Receiver Thread - received Image");
 
                     /**
                      * Reference: http://stackoverflow.com/q/3520019/5370202
-                     */
+
                     final Bitmap bm= BitmapFactory.decodeByteArray(receivedImg,0,receivedImg.length);
                     runOnUiThread(new Runnable() {
                         @Override
@@ -175,6 +197,8 @@ public class ReceiveFeedActivity extends AppCompatActivity implements Runnable{
                             receivedImageView.setImageBitmap(bm);
                         }
                     });
+                     */
+
 
                 }
             }
