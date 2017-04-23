@@ -40,26 +40,6 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
     private CameraPreview mPreview;
 
 
-    void initializeSendFeedActivity(String ip,int PortNo){
-        try{
-            senderSocket=new Socket(ip,PortNo);
-            Log.d("VS123","Sender Thread - created socket");
-            out=new BufferedWriter(new OutputStreamWriter(senderSocket.getOutputStream()));
-
-        }
-        catch (IOException e){
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getApplicationContext(),"Device not found!",Toast.LENGTH_LONG).show();
-                }
-            });
-
-            Log.d("VS123","Sender Thread - IOException from initializeSendFeedActivity()"+e.toString());
-        }
-
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,6 +108,35 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
 
     }
 
+
+
+    /**
+     * This function establishes socket connection over which dates will be sent
+     */
+    void initializeSendFeedActivity(String ip,int PortNo){
+        try{
+            senderSocket=new Socket(ip,PortNo);
+            Log.d("VS123","Sender Thread - created socket");
+            out=new BufferedWriter(new OutputStreamWriter(senderSocket.getOutputStream()));
+
+        }
+        catch (IOException e){
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(),"Device not found!",Toast.LENGTH_LONG).show();
+                }
+            });
+
+            Log.d("VS123","Sender Thread - IOException from initializeSendFeedActivity()"+e.toString());
+        }
+
+    }
+
+
+    /**
+     * This thread is used for sending dates over socket
+     */
     @Override
     public void run() {
 
@@ -151,16 +160,22 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
     }
 
 
-
+    /**
+     * Inner class is used so that some variables defined in Activity can be used directly without thinking about passing them to this class instance
+     */
     class ImgWriter extends Thread{
         Socket imgSenderSocket;
         DataOutputStream imgOutput;
-        String imgFolderPath="/storage/F074-706E/Demo/";
-        private Camera.PreviewCallback clickedImage;
-        Calendar c;
+        //String imgFolderPath="/storage/F074-706E/Demo/";  //Here saved images were present which were being sent over socket for testing
 
+        Calendar pastSentImageCal;
+
+
+        /**
+         * This function establishes socket connection over which images will be sent
+         */
         void initializeImgSend(String ip,int PortNo2){
-            c=Calendar.getInstance();
+            pastSentImageCal=Calendar.getInstance();  //This will be useful in setPreviewCallback
             try{
                 imgSenderSocket=new Socket(ip,PortNo2);
                 imgOutput = new DataOutputStream(imgSenderSocket.getOutputStream());
@@ -179,87 +194,63 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
                 Log.d("VS123","Img Sender Thread - IOException from initializeImgSend()"+e.toString());
             }
 
-            clickedImage=new Camera.PreviewCallback() {
-                @Override
-                public void onPreviewFrame(byte[] imgBytes, Camera camera) {
-                    try{
-                        Log.d("VS123",imgBytes.length+"");
-
-                        imgOutput.writeInt(imgBytes.length);
-                        imgOutput.write(imgBytes,0,imgBytes.length);
-                        imgOutput.flush();
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getApplicationContext(),"Sent Image to socket",Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-                        Log.d("VS123","Img Sender Thread - sent image via socket");
-
-                    }
-                    catch (Exception e){
-                        Log.d("VS123 Cam","Exception thrown from onPictureTaken in PictureCallback "+e.toString());
-                        e.printStackTrace();
-                    }
-                }
-            };
-
         }
 
+
+        /**
+         * This thread is used for sending images over socket
+         */
         @Override
         public void run() {
+            initializeImgSend(IPAddr,Integer.parseInt(getString(R.string.img_socket)));
+
             /**
              * Reference: http://stackoverflow.com/questions/16602736/android-send-an-image-through-socket-programming
              */
-            initializeImgSend(IPAddr,Integer.parseInt(getString(R.string.img_socket)));
-
-
             try{
                 while(true){
-                    //mCamera.takePicture(null,null,clickedImage);
+                    /**
+                     * takePicture caused a lot of latency while refreshing preview. Hence this was not selected
+                     */
                     mCamera.setPreviewCallback(new Camera.PreviewCallback() {
                         @Override
                         public void onPreviewFrame(byte[] imgBytes, Camera camera) {
                             try{
                                 Calendar currentTime=Calendar.getInstance();
-                                if(c.get(Calendar.MILLISECOND)/100==currentTime.get(Calendar.MILLISECOND)/100){
+                                if(pastSentImageCal.get(Calendar.MILLISECOND)/100==currentTime.get(Calendar.MILLISECOND)/100){
+                                    /**
+                                     * Compare current time milliseconds and milliseconds at which last image frame was sent.
+                                     * Here, both are divided by 100 thus achieving a frame rate of 10 fps
+                                     */
                                     return;
                                 }
 
-                                c=currentTime;
+                                pastSentImageCal=currentTime;  //If new image frame in new millisecond segment, store current Calendar instance
 
                                 Log.d("VS123",imgBytes.length+"");
 
+
+                                /**
+                                 * Initially YUV to Bitmap conversion was performed on receiver side which was found to be inefficient
+                                 * Reference: http://stackoverflow.com/a/9330203/5370202
+                                 */
                                 Camera.Parameters parameters = camera.getParameters();
                                 int width = parameters.getPreviewSize().width;
                                 int height = parameters.getPreviewSize().height;
-
-//                                imgOutput.writeInt(imgBytes.length);
-//                                imgOutput.writeInt(width);
-//                                imgOutput.writeInt(height);
-
-
                                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                                 YuvImage yuvImage = new YuvImage(imgBytes, ImageFormat.NV21, width, height, null);
                                 yuvImage.compressToJpeg(new Rect(0, 0, width, height), 50, out);
                                 byte[] imageBytes = out.toByteArray();
 
-                                imgOutput.writeInt(imageBytes.length);
-                                imgOutput.write(imageBytes,0,imageBytes.length);
+
+
+                                imgOutput.writeInt(imageBytes.length); //Send image size
+                                imgOutput.write(imageBytes,0,imageBytes.length); //Send image
                                 imgOutput.flush();
 
 
                                 int len=imageBytes.length;
 
-/*
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(getApplicationContext(),"Sent Image to socket",Toast.LENGTH_SHORT).show();
-                                    }
-                                });*/
 
                                 Log.d("VS123","Img Sender Thread - sent image of len "+len+" via socket");
 
@@ -306,17 +297,19 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
             }
         }
 
+        /*
         public byte[] getBytesFromBitmap(Bitmap bitmap) {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
             return stream.toByteArray();
-        }
+        }*/
     }
 }
 
 
 /**
  * Reference: https://developer.android.com/guide/topics/media/camera.html#camera-preview
+ * Except for parameters part, code is AS IS mentioned by example given above
  */
 
 /** A basic Camera preview class */
@@ -328,38 +321,14 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
         super(context);
         mCamera = camera;
 
+
+        /**
+         * Parameters can be changed over here
+         */
         Camera.Parameters parameters=mCamera.getParameters();
-
-        List<int[]> temp=parameters.getSupportedPreviewFpsRange();
-        //parameters.setPreviewFpsRange(temp.get(0)[0],temp.get(0)[1]);
-        //parameters.
-        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-
+        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE); //This is for auto-focus
         mCamera.setParameters(parameters);
         mCamera.setDisplayOrientation(90);
-
-
-/*
-        Camera.Size size = mCamera.getParameters().getPreviewSize();
-
-        //landscape
-        float ratio = (float)size.width/size.height;
-
-        //portrait
-        //float ratio = (float)size.height/size.width;
-
-        FrameLayout preview = (FrameLayout) findViewById(R.id.camPreview);
-
-        int new_width=0, new_height=0;
-        if(preview.getWidth()/preview.getHeight()<ratio){
-            new_width = Math.round(preview.getHeight()*ratio);
-            new_height = getHeight();
-        }else{
-            new_width = preview.getWidth();
-            new_height = Math.round(preview.getWidth()/ratio);
-        }
-        preview.setLayoutParams(new FrameLayout.LayoutParams(new_width, new_height));
-*/
 
 
 
