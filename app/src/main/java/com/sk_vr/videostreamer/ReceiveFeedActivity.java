@@ -35,6 +35,7 @@ public class ReceiveFeedActivity extends AppCompatActivity implements Runnable {
         contentDisplayText = (TextView) findViewById(R.id.contentDisplayText);
         receivedImageView = (ImageView) findViewById(R.id.receivedImg);
 
+        //receivedImageView.setRotationX((float) -90.0);
         CommonPortNo = Integer.parseInt(getResources().getString(R.string.common_socket));
         ImgPortNo = Integer.parseInt(getResources().getString(R.string.img_socket));
     }
