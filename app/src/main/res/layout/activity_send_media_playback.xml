@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.sk_vr.videostreamer.SendMediaPlayback"
+    android:background="@mipmap/bg">
+
+    <EditText
+        android:id="@+id/IPAddrText"
+        android:text="192.168.2.17"
+        android:hint="Enter receiver's IP Address"
+        android:textColor="@android:color/background_light"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/VideoPathText"
+        android:layout_below="@id/IPAddrText"
+        android:text="/storage/F074-706E/test1.mp4"
+        android:hint="Enter file path"
+        android:textColor="@android:color/background_light"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/sendFeedStartButton"
+        android:layout_below="@id/VideoPathText"
+        android:text="Send Feed"
+        android:background="@color/blue"
+        android:textColor="@android:color/background_light"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <com.sk_vr.videostreamer.CustomVideoView
+        android:id="@+id/senderVideoView"
+        android:layout_below="@id/sendFeedStartButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</RelativeLayout>

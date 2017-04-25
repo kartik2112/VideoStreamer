@@ -12,10 +12,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button send,receive;
+        Button send,receive,sendOffVid,receiveOffVid;
 
         send=(Button)findViewById(R.id.sendFeedButton);
         receive=(Button)findViewById(R.id.receiveFeedButton);
+        sendOffVid=(Button)findViewById(R.id.streamSendButton);
+        receiveOffVid=(Button)findViewById(R.id.streamReceiveButton);
 
         send.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -29,6 +31,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent i=new Intent(view.getContext(),ReceiveFeedActivity.class);
+                startActivity(i);
+            }
+        });
+
+        sendOffVid.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i=new Intent(view.getContext(),SendMediaPlayback.class);
+                startActivity(i);
+            }
+        });
+
+        receiveOffVid.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i=new Intent(view.getContext(),ReceiveMediaPlayback.class);
                 startActivity(i);
             }
         });
