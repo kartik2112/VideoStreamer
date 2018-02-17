@@ -16,14 +16,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.*;
 import java.util.Calendar;
@@ -32,8 +35,10 @@ import java.util.List;
 public class SendFeedActivity extends AppCompatActivity implements Runnable{
     Button startSendFeed;
     EditText IPAddrEditText;
+    TextView socketRecvrTextView;
     Socket senderSocket;
     BufferedWriter out;
+    BufferedReader in;
     String IPAddr;
     ImgWriter imgWriter;
     private Camera mCamera;
@@ -48,6 +53,7 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
 
         startSendFeed=(Button)findViewById(R.id.sendFeedStartButton);
         IPAddrEditText=(EditText)findViewById(R.id.IPAddrText);
+        socketRecvrTextView = (TextView)findViewById(R.id.socketRecvrTextView);
 
         startSendFeed.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,6 +111,7 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
             Log.d("VS123","Sender Thread - created socket");
             out=new BufferedWriter(new OutputStreamWriter(senderSocket.getOutputStream()));
 
+
         }
         catch (IOException e){
             runOnUiThread(new Runnable() {
@@ -133,9 +140,11 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
                 Log.d("VS123","Sender Thread - created date content to send ");
                 Calendar c=Calendar.getInstance();
                 String date=c.get(Calendar.HOUR_OF_DAY)+":"+c.get(Calendar.MINUTE)+":"+c.get(Calendar.SECOND);
-                out.write(date+"\n");
+                out.write(date+"\r\n");
                 out.flush();
                 Log.d("VS123","Sender Thread - wrote "+date+" via socket");
+
+
 
                 Thread.sleep(1000);
             }
@@ -156,6 +165,36 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
         Camera c = null;
         try {
             c = Camera.open(); // attempt to get a Camera instance
+            List<Camera.Size> ls= c.getParameters().getSupportedPreviewSizes();  //Reference: https://stackoverflow.com/a/8385634/5370202
+            Log.d("VS123","Supported Resolutions:");
+            boolean flagResoExists =false;
+            for(Camera.Size s:ls){
+                Log.d("VS123",s.width+"x"+s.height);
+                if(s.width == 640 && s.height == 480){
+                    flagResoExists = true;
+                }
+            }
+
+            if(flagResoExists){
+                Camera.Parameters params = c.getParameters();
+                params.setPreviewSize(640,480);
+
+                List<Integer> ls1 = params.getSupportedPreviewFrameRates();
+                Log.d("VS123",ls1.toString());
+
+                Log.d("VS123","Previous preview frame rate"+params.getPreviewFrameRate());
+
+                params.setPreviewFrameRate(params.getSupportedPreviewFrameRates().get(0));
+
+                Log.d("VS123","Current preview frame rate"+params.getPreviewFrameRate());
+
+
+                params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+//                c.setDisplayOrientation(90);
+//                params.setRotation(90);
+                c.setParameters(params);
+            }
+
         }
         catch (Exception e){
             // Camera is not available (in use or does not exist)
@@ -183,6 +222,7 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
             try{
                 imgSenderSocket=new Socket(ip,PortNo2);
                 imgOutput = new DataOutputStream(imgSenderSocket.getOutputStream());
+                in = new BufferedReader(new InputStreamReader(imgSenderSocket.getInputStream()));
 
                 Log.d("VS123","Img Sender Thread - created socket");
 
@@ -251,6 +291,24 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
                                 imgOutput.writeInt(imageBytes.length); //Send image size
                                 imgOutput.write(imageBytes,0,imageBytes.length); //Send image
                                 imgOutput.flush();
+
+
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try{
+                                            final String recvdText = in.readLine();
+                                            socketRecvrTextView.setText(recvdText);
+                                            Log.d("VS123","Received: "+recvdText);
+                                        }
+                                        catch (Exception e){
+                                            Log.d("VS123 Cam","Exception thrown from runonUiThread in onPictureTaken in PictureCallback "+e.toString());
+                                        }
+
+                                    }
+                                });
+
+
 
 
                                 int len=imageBytes.length;
