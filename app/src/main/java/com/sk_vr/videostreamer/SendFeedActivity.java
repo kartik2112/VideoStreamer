@@ -34,7 +34,7 @@ import java.util.List;
 
 public class SendFeedActivity extends AppCompatActivity implements Runnable{
     Button startSendFeed;
-    EditText IPAddrEditText;
+    EditText IPAddrEditText,PortAddrEditText;
     TextView socketRecvrTextView;
     Socket senderSocket;
     BufferedWriter out;
@@ -44,6 +44,7 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
     private Camera mCamera;
     private CameraPreview mPreview;
     int commonPort,imagePort;
+    Socket imgSenderSocket;
 
 
     @Override
@@ -53,6 +54,7 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
 
         startSendFeed=(Button)findViewById(R.id.sendFeedStartButton);
         IPAddrEditText=(EditText)findViewById(R.id.IPAddrText);
+        PortAddrEditText = (EditText)findViewById(R.id.PortAddrText);
         socketRecvrTextView = (TextView)findViewById(R.id.socketRecvrTextView);
 
         startSendFeed.setOnClickListener(new View.OnClickListener() {
@@ -60,20 +62,25 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
             public void onClick(View view) {
                 startSendFeed.setEnabled(false);
                 IPAddrEditText.setEnabled(false);
+                PortAddrEditText.setEnabled(false);
+
                 Log.d("VS123","Sender Thread - detected click");
+
                 IPAddr=IPAddrEditText.getText().toString();
+                imagePort=Integer.parseInt(PortAddrEditText.getText().toString());
+
                 Log.d("VS123","Sender Thread - found IP Address to be "+IPAddr);
                 if(IPAddr!=null && IPAddr.length()!=0){
                     Log.d("VS123","Sender Thread - created");
-                    new Thread(SendFeedActivity.this).start();
+//                    new Thread(SendFeedActivity.this).start();
                     imgWriter=new ImgWriter();
                     imgWriter.start();
                 }
             }
         });
 
-        commonPort=Integer.parseInt(getResources().getString(R.string.common_socket));
-        imagePort=Integer.parseInt(getResources().getString(R.string.img_socket));
+//        commonPort=Integer.parseInt(getResources().getString(R.string.common_socket));
+//        imagePort=Integer.parseInt(getResources().getString(R.string.img_socket));
 
         // Create an instance of Camera
         mCamera = getCameraInstance();
@@ -89,14 +96,15 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
     @Override
     protected void onStop() {
         super.onStop();
-        try{
-            mCamera.release();
-            senderSocket.close();
-            imgWriter.imgSenderSocket.close();
-        }
-        catch(IOException e){
-            Log.d("VS123","Sender Thread - IOException from onStop() in SendFeed"+e.toString());
-        }
+        mCamera.release();
+//        try{
+//
+////            senderSocket.close();
+////            imgSenderSocket.close();
+//        }
+//        catch(IOException e){
+//            Log.d("VS123","Sender Thread - IOException from onStop() in SendFeed"+e.toString());
+//        }
 
     }
 
@@ -173,6 +181,9 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
                 if(s.width == 640 && s.height == 480){
                     flagResoExists = true;
                 }
+//                if(s.width == 320 && s.height == 240){
+//                    flagResoExists = true;
+//                }
             }
 
             if(flagResoExists){
@@ -184,7 +195,7 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
 
                 Log.d("VS123","Previous preview frame rate"+params.getPreviewFrameRate());
 
-                params.setPreviewFrameRate(params.getSupportedPreviewFrameRates().get(0));
+//                params.setPreviewFrameRate(params.getSupportedPreviewFrameRates().get(0));
 
                 Log.d("VS123","Current preview frame rate"+params.getPreviewFrameRate());
 
@@ -207,23 +218,28 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
      * Inner class is used so that some variables defined in Activity can be used directly without thinking about passing them to this class instance
      */
     class ImgWriter extends Thread{
-        Socket imgSenderSocket;
+
         DataOutputStream imgOutput;
         //String imgFolderPath="/storage/F074-706E/Demo/";  //Here saved images were present which were being sent over socket for testing
 
-        Calendar pastSentImageCal;
+//        Calendar pastSentImageCal;
+
+        int imgCtr = 0;
+        int customFrameRate = 5;
+
+        int frameNoThresh = 30 / customFrameRate;
 
 
         /**
          * This function establishes socket connection over which images will be sent
          */
         void initializeImgSend(String ip,int PortNo2){
-            pastSentImageCal=Calendar.getInstance();  //This will be useful in setPreviewCallback
+//            pastSentImageCal=Calendar.getInstance();  //This will be useful in setPreviewCallback
             try{
                 imgSenderSocket=new Socket(ip,PortNo2);
                 imgOutput = new DataOutputStream(imgSenderSocket.getOutputStream());
-                in = new BufferedReader(new InputStreamReader(imgSenderSocket.getInputStream()));
-
+//                in = new BufferedReader(new InputStreamReader(imgSenderSocket.getInputStream()));
+                new SignReader().start();
                 Log.d("VS123","Img Sender Thread - created socket");
 
             }
@@ -252,7 +268,7 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
              * Reference: http://stackoverflow.com/questions/16602736/android-send-an-image-through-socket-programming
              */
             try{
-                while(true){
+//                while(true){
                     /**
                      * takePicture caused a lot of latency while refreshing preview. Hence this was not selected
                      */
@@ -260,16 +276,20 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
                         @Override
                         public void onPreviewFrame(byte[] imgBytes, Camera camera) {
                             try{
-                                Calendar currentTime=Calendar.getInstance();
-                                if(pastSentImageCal.get(Calendar.MILLISECOND)/100==currentTime.get(Calendar.MILLISECOND)/100){
-                                    /**
-                                     * Compare current time milliseconds and milliseconds at which last image frame was sent.
-                                     * Here, both are divided by 100 thus achieving a frame rate of 10 fps
-                                     */
+//                                Calendar currentTime=Calendar.getInstance();
+//                                if(pastSentImageCal.get(Calendar.MILLISECOND)/100==currentTime.get(Calendar.MILLISECOND)/100){
+//                                    /**
+//                                     * Compare current time milliseconds and milliseconds at which last image frame was sent.
+//                                     * Here, both are divided by 100 thus achieving a frame rate of 10 fps
+//                                     */
+//                                    return;
+//                                }
+//
+//                                pastSentImageCal=currentTime;  //If new image frame in new millisecond segment, store current Calendar instance
+                                imgCtr = (imgCtr + 1)%(frameNoThresh);
+                                if((imgCtr) != 0){
                                     return;
                                 }
-
-                                pastSentImageCal=currentTime;  //If new image frame in new millisecond segment, store current Calendar instance
 
                                 Log.d("VS123",imgBytes.length+"");
 
@@ -293,23 +313,6 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
                                 imgOutput.flush();
 
 
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        try{
-                                            final String recvdText = in.readLine();
-                                            socketRecvrTextView.setText(recvdText);
-                                            Log.d("VS123","Received: "+recvdText);
-                                        }
-                                        catch (Exception e){
-                                            Log.d("VS123 Cam","Exception thrown from runonUiThread in onPictureTaken in PictureCallback "+e.toString());
-                                        }
-
-                                    }
-                                });
-
-
-
 
                                 int len=imageBytes.length;
 
@@ -325,8 +328,8 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
                     });
 
 
-                    Thread.sleep(1000);
-                }
+//                    Thread.sleep(1000);
+//                }
                 /*
                 //Stored Images Send Code
                 for(int imgNo=1;imgNo<=7;imgNo++){
@@ -365,6 +368,47 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
             bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
             return stream.toByteArray();
         }*/
+    }
+
+    class SignReader extends Thread{
+
+        void initializeSignRecv(){
+
+            try{
+                in = new BufferedReader(new InputStreamReader(imgSenderSocket.getInputStream()));
+
+                Log.d("VS123","SignReader Thread - connected to socket's input stream");
+
+            }
+            catch (IOException e){
+
+
+                Log.d("VS123","SignReader Thread - IOException from initializeImgSend()"+e.toString());
+            }
+
+        }
+
+        @Override
+        public void run(){
+            initializeSignRecv();
+            while(true){
+                try{
+                    final String recvdText = in.readLine();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            socketRecvrTextView.setText(recvdText);
+                            Log.d("VS123","Received: "+recvdText);
+                        }
+                    });
+                }
+                catch (Exception e){
+                    Log.d("VS123 Cam","Exception thrown from runonUiThread in onPictureTaken in PictureCallback "+e.toString());
+                }
+
+            }
+
+        }
     }
 }
 
