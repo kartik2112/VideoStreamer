@@ -3,6 +3,7 @@ package com.sk_vr.videostreamer;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
@@ -35,7 +36,7 @@ import java.util.List;
 public class SendFeedActivity extends AppCompatActivity implements Runnable{
     Button startSendFeed;
     EditText IPAddrEditText,PortAddrEditText;
-    TextView socketRecvrTextView;
+    TextView socketRecvrTextView,gestureTextView;
     Socket senderSocket;
     BufferedWriter out;
     BufferedReader in;
@@ -56,26 +57,58 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
         IPAddrEditText=(EditText)findViewById(R.id.IPAddrText);
         PortAddrEditText = (EditText)findViewById(R.id.PortAddrText);
         socketRecvrTextView = (TextView)findViewById(R.id.socketRecvrTextView);
+        gestureTextView = (TextView)findViewById(R.id.gestureText);
+
 
         startSendFeed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startSendFeed.setEnabled(false);
-                IPAddrEditText.setEnabled(false);
-                PortAddrEditText.setEnabled(false);
+                if(IPAddrEditText.isEnabled()){
+                    IPAddrEditText.setEnabled(false);
+                    PortAddrEditText.setEnabled(false);
 
-                Log.d("VS123","Sender Thread - detected click");
+                    Log.d("VS123","Sender Thread - detected click");
 
-                IPAddr=IPAddrEditText.getText().toString();
-                imagePort=Integer.parseInt(PortAddrEditText.getText().toString());
+                    IPAddr=IPAddrEditText.getText().toString();
+                    imagePort=Integer.parseInt(PortAddrEditText.getText().toString());
 
-                Log.d("VS123","Sender Thread - found IP Address to be "+IPAddr);
-                if(IPAddr!=null && IPAddr.length()!=0){
-                    Log.d("VS123","Sender Thread - created");
+                    Log.d("VS123","Sender Thread - found IP Address to be "+IPAddr);
+                    if(IPAddr!=null && IPAddr.length()!=0){
+                        Log.d("VS123","Sender Thread - created");
 //                    new Thread(SendFeedActivity.this).start();
-                    imgWriter=new ImgWriter();
-                    imgWriter.start();
+                        imgWriter=new ImgWriter();
+                        imgWriter.start();
+                    }
+
+                    startSendFeed.setBackgroundColor(Color.RED);
+                    startSendFeed.setText("Stop Feed");
                 }
+                else{
+                    IPAddrEditText.setEnabled(true);
+                    PortAddrEditText.setEnabled(true);
+
+                    Log.d("VS123","Sender Thread - detected click");
+
+
+                    try{
+                        mCamera.setPreviewCallback(null);
+                        imgWriter.imgOutput.writeInt(0);
+                        imgWriter.join();
+                        imgWriter.signReader.join();
+
+                        imgSenderSocket.close();
+                    }
+                    catch(IOException e){
+                        Log.d("VS123","Sender Thread - IOException from onStop() in SendFeed"+e.toString());
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    startSendFeed.setBackgroundColor(Color.BLUE);
+                    startSendFeed.setText("Start Feed");
+                }
+
+
             }
         });
 
@@ -229,6 +262,8 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
 
         int frameNoThresh = 30 / customFrameRate;
 
+        SignReader signReader;
+
 
         /**
          * This function establishes socket connection over which images will be sent
@@ -239,7 +274,8 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
                 imgSenderSocket=new Socket(ip,PortNo2);
                 imgOutput = new DataOutputStream(imgSenderSocket.getOutputStream());
 //                in = new BufferedReader(new InputStreamReader(imgSenderSocket.getInputStream()));
-                new SignReader().start();
+                signReader = new SignReader();
+                signReader.start();
                 Log.d("VS123","Img Sender Thread - created socket");
 
             }
@@ -394,6 +430,18 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
             while(true){
                 try{
                     final String recvdText = in.readLine();
+//                    if(recvdText.indexOf("GESTURE:")!=-1){
+//                        runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                gestureTextView.setText(recvdText.substring(recvdText.indexOf("GESTURE:")+("GESTURE:").length()));
+//                                Log.d("VS123","Received: "+recvdText);
+//                            }
+//                        });
+//                    }
+                    if(recvdText.equals("QUIT")){
+                        return;
+                    }
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -404,6 +452,7 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
                 }
                 catch (Exception e){
                     Log.d("VS123 Cam","Exception thrown from runonUiThread in onPictureTaken in PictureCallback "+e.toString());
+                    return;
                 }
 
             }

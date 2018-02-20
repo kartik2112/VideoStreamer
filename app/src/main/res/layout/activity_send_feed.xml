@@ -70,6 +70,15 @@
             android:layout_weight="1"/>
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/gestureText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text=""
+        android:textColor="@android:color/white"
+        android:textSize="28dp" />
+
     <FrameLayout
         android:id="@+id/camPreview"
         android:layout_below="@id/SendFeedLayout"
