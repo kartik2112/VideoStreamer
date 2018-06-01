@@ -222,6 +222,7 @@ public class SendFeedActivity extends AppCompatActivity implements Runnable{
             if(flagResoExists){
                 Camera.Parameters params = c.getParameters();
                 params.setPreviewSize(640,480);
+//                params.set("image-stabilizer", "ois");
 
                 List<Integer> ls1 = params.getSupportedPreviewFrameRates();
                 Log.d("VS123",ls1.toString());
